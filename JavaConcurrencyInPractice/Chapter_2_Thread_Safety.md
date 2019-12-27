@@ -14,9 +14,7 @@ Managing access to *state*, and in particular to *shared, mutable state*.
 - A class is *thread-safe* if it behaves correctly when accessed from multiple threads, regardless of the scheduling or interleaving of the execution of those threads by the runtime environment, and with no additional synchronization or other coordination on the part of the calling code
 - Stateless objects are always thread-safe
 
-1. 
-
- ### 2. ATOMICITY
+### 2. ATOMICITY
 
 - **Race Condition**
   - check-then-act (lazy initialization: check whether an object is null and create only one)
