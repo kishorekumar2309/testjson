@@ -155,4 +155,79 @@
 
 **ITEM 21: Design Interfaces For Posterity**
 
-- 
+- risks of interface default methods:
+  - “injected” into existing implementations without the knowledge or consent of their implementors
+  - **it is not always possible to write a default method that maintains all invariants of every conceivable implementation** (e.g. Collection - removeIf, which Apache `SynchronizedCollection` does not override)
+  - **existing implementations of an interface may compile without error or warning but fail at runtime**
+- critically important to test each new interface before release it (3 diverse implementations)
+
+
+
+**ITEM 22: Use Interfaces Only To Define Types**
+
+- the interface serves as a *type* that can be used to refer to instances of the class
+
+- interface should say something about what a client can do with instances of the class 
+
+- **poor use of interfaces**: *constant interface* - contains no methods; it consists solely of static final fields, each exporting a constant
+
+  - alternatives: *enum type* or noninstantiable *utility class* 
+
+  
+
+**ITEM 23: Prefer Class Hierarchies To Tagged Classes**
+
+- tagged class - class whose instances come in two or more flavors and contain a *tag* field indicating the flavor of the instance (e.g. circle or a rectangle)
+- problems with tagged classes - cluttered with boilerplate - enum declarations, tag fields, switch statements and **tagged classes are verbose, error-prone, and inefficient**
+- **tagged class is just a pallid imitation of a class hierarchy**. Steps to transform a tagged class into a class hierarchy:
+  - define an abstract class containing: 
+    - abstract method for each method in the tagged class whose behavior depends on the tag value
+    - any methods whose behavior does not depend on the value of the tag
+    - any data fields used by all the flavors
+  - define a concrete subclass of the root class for each flavor of the original tagged class and in each subclass
+    - include the data fields particular to its flavor
+    - appropriate implementation of each abstract method in the root class
+
+
+
+**ITEM 24: Favor Static Member Classes Over Nonstatic**
+
+- *nested class* - a class defined within another class and should exist only to serve its enclosing class otherwise it should be a top-level class
+- 4 kinds of nested classes and when to use them:
+  1. *static member classes*:
+     - simplest kind - declared inside another class and has access to all of the enclosing class’s members, even those declared private
+     - access to static member of its enclosing class and obeys the same accessibility rules as other static members
+     - common use: public helper class, useful only in conjunction with its outer class (e.g. enum describing the operations supported by a calculator)
+  2. *nonstatic member classes*:
+     - each instance of a nonstatic member class is implicitly associated with an *enclosing instance* of its containing class
+     - can invoke methods on the enclosing instance or obtain a reference to the enclosing instance using the *qualified this* construct
+     - impossible to create an instance of a nonstatic member class without an enclosing instance
+     - common use: *Adapter* - allows an instance of the outer class to be viewed as an instance of some unrelated class (e.g. Map - keySet, entrySet)
+  3. *anonymous classes*:
+     - has no name and not a member of its enclosing class
+     - limitations on the applicability of anonymous classes
+       - can’t instantiate them except at the point they’re declared
+       - can’t perform `instanceof` tests or do anything else that requires you to name the class
+       - implementing a interface or extending a class is not supported
+       - must be kept short—about ten lines or fewer—or readability will suffer
+     - common use: implementation of static factory methods
+     - lambdas are now preferred
+  4. *local classes*
+     - least frequently used
+     - they have names and can be used repeatedly
+     - like anonymous classes they
+       - have enclosing instances only if they are defined in a nonstatic context
+       - cannot contain static members
+       - should be kept short so as not to harm readability
+- ***always*** **put the** `static` **modifier in its declaration,** **for a member class that does not require access to an enclosing instance**. Omitting the modifier causes
+  - each instance will have a hidden extraneous reference to its enclosing instance - storing this reference takes time and space
+  - result in the enclosing instance being retained when it would otherwise be eligible for garbage collection - memory leak can be catastrophic
+
+
+
+**ITEM 25: Limit Source Files To A Single Top-Level Class**
+
+- split the top-level classes into separate source files
+- alternative - use static member classes
+- **Never put multiple top-level classes or interfaces in a single source file**
+
